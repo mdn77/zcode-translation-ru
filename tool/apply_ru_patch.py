@@ -34,6 +34,12 @@ import time
 
 BT = chr(96)  # the JS bundle stores message values in backquote template literals
 RU_LABEL = 'Русский'
+# Injected identifiers MUST be unique: the bundles are minified and short names
+# like "rue" already exist there (a duplicate binding kills the whole module and
+# the window never renders). Double-underscore names never appear in minified code.
+RU_VAR_CATALOG = '__zcodeRuCat'
+RU_VAR_EXPORT = '__zcodeRu'
+RU_VAR_LOCAL = '__zcodeRue'
 
 # --------------------------------------------------------------------------
 # small helpers
@@ -44,8 +50,13 @@ def qx(s):
 
 
 # Regex building blocks for literal braces, f-string-safe by construction.
+# OB/CB are REGEX character classes (for patterns); LBR/RBR are the literal
+# brace characters for REPLACEMENT strings. Mixing them up produces "[{]" in
+# the output instead of "{".
 OB = f'[{chr(123)}]'
 CB = f'[{chr(125)}]'
+LBR = chr(123)
+RBR = chr(125)
 
 
 def js_template_escape(value):
@@ -143,12 +154,12 @@ def patch_catalog_chunk(text, ru_literal):
     anchor = 'var p={'
     if anchor not in text:
         raise RuntimeError('catalog var anchor "var p={" not found')
-    text = text.replace(anchor, f'var ruCat={ru_literal},p={{', 1)
+    text = text.replace(anchor, f'var {RU_VAR_CATALOG}={ru_literal},p={{', 1)
     report['ru catalog inserted'] = len(ru_literal)
 
     # 3. Register ru in the locale map.
     text, n = re.subn(r'\{"zh-CN":(\w+),"en-US":(\w+)\}',
-                      lambda m: f'{{"zh-CN":{m.group(1)},"en-US":{m.group(2)},"ru":ruCat}}',
+                      lambda m: f'{{"zh-CN":{m.group(1)},"en-US":{m.group(2)},"ru":{RU_VAR_CATALOG}}}',
                       text)
     report['locale map patched'] = n
     if n < 1:
@@ -173,7 +184,7 @@ def patch_catalog_chunk(text, ru_literal):
 
     # 6. Export the ru catalog for the main bundle.
     text, n = re.subn(r'export\{([^{}]+)\}',
-                      lambda m: f'export{{{m.group(1)},ruCat as ru}}',
+                      lambda m: f'export{{{m.group(1)},{RU_VAR_CATALOG} as {RU_VAR_EXPORT}}}',
                       text, count=1)
     report['export patched'] = n
     if n < 1:
@@ -188,7 +199,7 @@ def patch_main_chunk(text):
 
     # 1. Import the ru catalog exported by the IntlProvider chunk.
     text, n = re.subn(r'import\{([^{}]+)\}from"(\./IntlProvider-[^"]+\.js)"',
-                      lambda m: f'import{{{m.group(1)},ru as rue}}from"{m.group(2)}"',
+                      lambda m: f'import{{{m.group(1)},{RU_VAR_EXPORT} as {RU_VAR_LOCAL}}}from"{m.group(2)}"',
                       text, count=1)
     report['import patched'] = n
     if n < 1:
@@ -197,8 +208,8 @@ def patch_main_chunk(text):
     # 2. Error-screen dictionary getter: add a ru branch.
     text, n = re.subn(
         f'function (?P<f>\\w+)\\(e\\){OB}return\\((?P<g>\\w+)\\(\\)==={qx("en-US")}\\?(?P<en>\\w+):(?P<zh>\\w+)\\)\\[e\\]\\?\\?e{CB}',
-        lambda m: (f'function {m.group("f")}(e){OB}return({m.group("g")}()==={qx("en-US")}?{m.group("en")}:'
-                   f'{m.group("g")}()==={qx("ru")}?rue:{m.group("zh")})[e]??e{CB}'),
+        lambda m: (f'function {m.group("f")}(e){LBR}return({m.group("g")}()==={qx("en-US")}?{m.group("en")}:'
+                   f'{m.group("g")}()==={qx("ru")}?{RU_VAR_LOCAL}:{m.group("zh")})[e]??e{RBR}'),
         text, count=1)
     report['error dict patched'] = n
     if n < 1:
@@ -225,8 +236,8 @@ def patch_main_chunk(text):
     text, n = re.subn(
         f'\\(0,(?P<jsx>[\\w$]+\\.[\\w$]+)\\)\\((?P<cmp>[\\w$]+),{OB}value:{qx("en-US")},children:(?P<fmt>[\\w$]+)\\.formatMessage\\({OB}id:{qx("sidebar.settings.locale.en-US")}{CB}\\){CB}\\)',
         lambda m: (m.group(0) +
-                   f',(0,{m.group("jsx")})({m.group("cmp")},{OB}value:{qx("ru")},children:'
-                   f'{m.group("fmt")}.formatMessage({OB}id:{qx("sidebar.settings.locale.ru")}{CB}){CB})'),
+                   f',(0,{m.group("jsx")})({m.group("cmp")},{LBR}value:{qx("ru")},children:'
+                   f'{m.group("fmt")}.formatMessage({LBR}id:{qx("sidebar.settings.locale.ru")}{RBR}){RBR})'),
         text, count=1)
     report['sidebar dropdown option added'] = n
     if n < 1:
@@ -236,15 +247,36 @@ def patch_main_chunk(text):
     text, n = re.subn(
         f'\\(0,(?P<jsx>[\\w$]+\\.[\\w$]+)\\)\\((?P<cmp>[\\w$]+),{OB}value:{qx("en-US")},"data-testid":(?P<tid>[\\w$]+)\\((?P<tidarg>[\\w$]+),{qx("en-US")}\\),children:(?P<fmt>[\\w$]+)\\.formatMessage\\({OB}id:{qx("settings.locale.en-US")}{CB}\\){CB}\\)',
         lambda m: (m.group(0) +
-                   f',(0,{m.group("jsx")})({m.group("cmp")},{OB}value:{qx("ru")},"data-testid":'
+                   f',(0,{m.group("jsx")})({m.group("cmp")},{LBR}value:{qx("ru")},"data-testid":'
                    f'{m.group("tid")}({m.group("tidarg")},{qx("ru")}),children:'
-                   f'{m.group("fmt")}.formatMessage({OB}id:{qx("settings.locale.ru")}{CB}){CB})'),
+                   f'{m.group("fmt")}.formatMessage({LBR}id:{qx("settings.locale.ru")}{RBR}){RBR})'),
         text, count=1)
     report['settings dropdown option added'] = n
     if n < 1:
         raise RuntimeError('settings language dropdown not found')
 
     return text, report
+
+
+def syntax_check(chunks, check_dir):
+    """node --check every patched chunk (as ESM). A syntax error here means the
+    whole renderer module would fail to parse and the window would never render."""
+    node = shutil.which('node')
+    if not node:
+        print('  WARNING: node not found, skipping syntax check')
+        return
+    for name, text in chunks:
+        path = os.path.abspath(os.path.join(check_dir, 'syntax-check.mjs'))
+        with io.open(path, 'w', encoding='utf-8') as f:
+            f.write(text)
+        proc = subprocess.run([node, '--check', path], shell=False,
+                              capture_output=True, text=True)
+        os.remove(path)
+        if proc.returncode != 0:
+            lines = (proc.stderr or '').strip().splitlines()
+            raise RuntimeError('syntax check FAILED for ' + name + ': ' +
+                               (lines[-2] if len(lines) >= 2 else proc.stderr[:300]))
+        print('  syntax OK: ' + name)
 
 # --------------------------------------------------------------------------
 # installation discovery and top-level flow
@@ -347,10 +379,14 @@ def main():
     with io.open(os.path.join(assets, main_name), encoding='utf-8') as f:
         main_text = f.read()
 
-    if '"ru":ruCat' in cat_text:
+    if f'"ru":{RU_VAR_CATALOG}' in cat_text:
         print('Already patched — nothing to do.')
         shutil.rmtree(workdir, ignore_errors=True)
         return 0
+
+    for injected in (RU_VAR_CATALOG, RU_VAR_EXPORT, RU_VAR_LOCAL):
+        if injected in cat_text or injected in main_text:
+            raise RuntimeError(f'injecting "{injected}" would collide with existing code')
 
     ru_literal = build_ru_literal(ru_catalog, RU_EXTRA_LABELS)
     print('Patching catalog chunk...')
@@ -361,6 +397,9 @@ def main():
     new_main, rep2 = patch_main_chunk(main_text)
     for k, v in rep2.items():
         print(f'  {k}: {v}')
+
+    print('Syntax-checking patched chunks (node --check)...')
+    syntax_check([('IntlProvider chunk', new_cat), ('main bundle', new_main)], workdir)
 
     if args.dry_run:
         shutil.rmtree(workdir, ignore_errors=True)
@@ -409,10 +448,10 @@ def main():
                                'out', 'renderer', 'assets', catalog_name).decode('utf-8', 'ignore')
     main_new = read_entry_bytes(packed, header_new, data_new,
                                 'out', 'renderer', 'assets', main_name).decode('utf-8', 'ignore')
-    for marker in ('"ru":ruCat', 'ruCat as ru', '"settings.locale.ru"'):
+    for marker in (RU_VAR_CATALOG, RU_VAR_EXPORT, '"settings.locale.ru"'):
         if marker not in cat_new:
             problems.append(f'marker {marker!r} missing in catalog chunk')
-    for marker in ('ru as rue', '?rue:', qx('sidebar.settings.locale.ru')):
+    for marker in (RU_VAR_LOCAL, qx('sidebar.settings.locale.ru')):
         if marker not in main_new:
             problems.append(f'marker {marker!r} missing in main bundle')
     if problems:
