@@ -38,6 +38,17 @@
 > ✅ Проверено на **ZCode Desktop 3.14.4 (Windows 11)**, октябрь 2026.
 > Скриншот выше — реальный интерфейс после установки.
 
+<table>
+<tr>
+<td><img src="docs/screenshot-language.png" alt="Переключатель языка: Русский" width="400"></td>
+<td>Язык выбирается прямо в приложении — <b>Настройки → Язык → Русский</b>.<br><br>
+Английский и китайский никуда не делись: переключайтесь в любой момент.
+При «Как в системе» на русской Windows русский выберется автоматически.<br><br>
+<sub>Language picker with the new «Русский» item (checkmarked). English and
+中文简体 remain switchable at any time.</sub></td>
+</tr>
+</table>
+
 ### Требования
 
 | Что | Где взять | Как проверить |
@@ -198,7 +209,7 @@ validators, system-locale resolver, both language dropdowns, and even the
 crash screen.
 
 > ✅ Battle-tested on **ZCode Desktop 3.14.4 (Windows 11)**, October 2026.
-> The screenshot above is the real UI after installation.
+> The screenshots above are the real UI after installation.
 
 ### Requirements
 
@@ -268,7 +279,8 @@ tool/swap_after_close.cmd           plain file swap helper
 translations/ru-RU-catalog.json     Russian catalog, 6 013 strings
 translations/en-US-catalog.json     original English catalog (reference)
 translations/batches/*.json         per-batch translations (for improvements)
-docs/screenshot-ru.png              real UI screenshot
+docs/screenshot-ru.png              real UI screenshot (usage stats)
+docs/screenshot-language.png        language picker with «Русский»
 ```
 
 ### Notes
