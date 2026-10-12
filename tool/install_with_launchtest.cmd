@@ -34,24 +34,17 @@ if not errorlevel 1 (
 )
 
 tasklist /FI "IMAGENAME eq ZCode.exe" 2>nul | find /I "ZCode.exe" >nul
-if not errorlevel 1 (
-  echo [FAIL] ZCode.exe still running, aborting without changes >> "%LOG%"
-  exit /b 1
-)
+if not errorlevel 1 goto still_running
 
-rem --- drop any downloaded-but-unapplied update: it would silently
-rem     overwrite the patched app.asar on the next launch ---
+rem Drop any downloaded-but-unapplied update: it would silently overwrite
+rem the patched app.asar on the next launch.
 if exist "%UPD%\pending" rd /s /q "%UPD%\pending" >> "%LOG%" 2>&1
-del /q "%UPD%\installer.exe" >> "%LOG%" 2>&1
-del /q "%UPD%\current.blockmap" >> "%LOG%" 2>&1
+if exist "%UPD%\installer.exe" del /q "%UPD%\installer.exe" >> "%LOG%" 2>&1
+if exist "%UPD%\current.blockmap" del /q "%UPD%\current.blockmap" >> "%LOG%" 2>&1
 
 copy /Y "%ASAR%" "%PREV%" >> "%LOG%" 2>&1
 copy /Y "%NEW%" "%ASAR%" >> "%LOG%" 2>&1
-if errorlevel 1 (
-  echo [FAIL] copy failed, restoring >> "%LOG%"
-  copy /Y "%PREV%" "%ASAR%" >> "%LOG%" 2>&1
-  exit /b 1
-)
+if errorlevel 1 goto copy_failed
 echo %DATE% %TIME% patch installed, launching ZCode for the test >> "%LOG%"
 
 start "" "%EXE%"
@@ -59,33 +52,51 @@ timeout /t 35 /nobreak >nul
 
 for /f %%C in ('powershell -NoProfile -Command "(Get-Process ZCode -ErrorAction SilentlyContinue | Where-Object {$_.MainWindowTitle} | Measure-Object).Count"') do set "WINCOUNT=%%C"
 echo %DATE% %TIME% visible windows: %WINCOUNT% >> "%LOG%"
+if "%WINCOUNT%"=="0" goto no_window
 
-if "%WINCOUNT%"=="0" (
-  echo %DATE% %TIME% NO WINDOW - reverting to original >> "%LOG%"
-  taskkill /F /IM ZCode.exe >> "%LOG%" 2>&1
-  timeout /t 3 /nobreak >nul
-  copy /Y "%PREV%" "%ASAR%" >> "%LOG%" 2>&1
-  echo %DATE% %TIME% [REVERTED] original app.asar restored >> "%LOG%"
-  start "" "%EXE%"
-  exit /b 1
-)
-
-rem --- verify the patched file is still in place (nothing overwrote it) ---
 for %%A in ("%ASAR%") do set "SIZE_A=%%~zA"
 for %%B in ("%NEW%") do set "SIZE_N=%%~zB"
-if not "!SIZE_A!"=="!SIZE_N!" (
-  echo %DATE% %TIME% [WARN] app.asar size !SIZE_A! differs from patch !SIZE_N! after launch >> "%LOG%"
-  if "!RETRIED!"=="0" (
-    set "RETRIED=1"
-    echo %DATE% %TIME% patch was overwritten after launch - retrying once >> "%LOG%"
-    goto install
-  )
-  echo %DATE% %TIME% [FAIL] patch keeps being overwritten (auto-update?) - giving up >> "%LOG%"
-  exit /b 1
-)
+echo %DATE% %TIME% app.asar size: !SIZE_A! (patch !SIZE_N!) >> "%LOG%"
+if "!SIZE_A!"=="!SIZE_N!" goto success
+echo %DATE% %TIME% [WARN] app.asar was overwritten after launch (auto-update?) >> "%LOG%"
+if "!RETRIED!"=="1" goto overwritten_again
+set "RETRIED=1"
+echo %DATE% %TIME% retrying install once >> "%LOG%"
+goto install
 
+:success
 echo %DATE% %TIME% [SUCCESS] window is up and patch verified in place >> "%LOG%"
 echo %DATE% %TIME% open Settings - Language - Russian >> "%LOG%"
+goto cleanup
+
+:no_window
+echo %DATE% %TIME% NO WINDOW - reverting to original >> "%LOG%"
+taskkill /F /IM ZCode.exe >> "%LOG%" 2>&1
+timeout /t 3 /nobreak >nul
+copy /Y "%PREV%" "%ASAR%" >> "%LOG%" 2>&1
+echo %DATE% %TIME% [REVERTED] original app.asar restored >> "%LOG%"
+start "" "%EXE%"
+goto cleanup_fail
+
+:overwritten_again
+echo %DATE% %TIME% [FAIL] patch keeps being overwritten - giving up >> "%LOG%"
+goto cleanup_fail
+
+:copy_failed
+echo %DATE% %TIME% [FAIL] copy failed, restoring >> "%LOG%"
+copy /Y "%PREV%" "%ASAR%" >> "%LOG%" 2>&1
+goto cleanup_fail
+
+:still_running
+echo %DATE% %TIME% [FAIL] ZCode.exe still running, aborting without changes >> "%LOG%"
+goto cleanup_fail
+
+:cleanup
 schtasks /delete /f /tn "ZCodeRuSwap" >nul 2>&1
 schtasks /delete /f /tn "ZCodeRuSwap2" >nul 2>&1
 exit /b 0
+
+:cleanup_fail
+schtasks /delete /f /tn "ZCodeRuSwap" >nul 2>&1
+schtasks /delete /f /tn "ZCodeRuSwap2" >nul 2>&1
+exit /b 1

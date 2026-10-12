@@ -9,7 +9,7 @@
 **6 013 строк интерфейса · переключатель «Русский» в настройках · патчер с автотестом запуска и автооткатом**
 
 [![ZCode](https://img.shields.io/badge/app-ZCode%20Desktop-blue)](https://z.ai)
-[![tested](https://img.shields.io/badge/tested-3.14.4%20Win-success)](#-русский)
+[![tested](https://img.shields.io/badge/tested-3.15.1%20Win-success)](#-русский)
 [![strings](https://img.shields.io/badge/strings-6%20013-green)](translations/ru-RU-catalog.json)
 [![license](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
@@ -35,7 +35,7 @@
 карта локалей, валидаторы, системный определитель, оба выпадающих списка
 в настройках и даже экран критической ошибки.
 
-> ✅ Проверено на **ZCode Desktop 3.14.4 (Windows 11)**, октябрь 2026.
+> ✅ Проверено на **ZCode Desktop 3.14.4 и 3.15.1 (Windows 11)**, октябрь 2026.
 > Скриншот выше — реальный интерфейс после установки.
 
 <table>
@@ -61,62 +61,55 @@
 Никаких платных инструментов; интернет нужен один раз — чтобы скачался
 упаковщик `@electron/asar`.
 
-### Установка за 5 шагов (Windows)
+### Установка в один клик (рекомендуется)
 
-**Шаг 1.** Скачайте репозиторий (зелёная кнопка **Code → Download ZIP**,
-или через git):
+**Шаг 1.** Скачайте репозиторий: зелёная кнопка **Code → Download ZIP**,
+распакуйте. (Или `git clone https://github.com/mdn77/zcode-translation-ru.git`.)
 
-```cmd
-git clone https://github.com/mdn77/zcode-translation-ru.git
-cd zcode-translation-ru
-```
+**Шаг 2.** Запустите **`install-ru.cmd`** двойным кликом.
 
-**Шаг 2.** Соберите патч (найдёт ZCode сам, проверит синтаксис, создаст
-резервную копию и подготовит новый файл):
+Скрипт сам всё сделает: проверит Python и Node.js, обновит файлы (если это
+git-клонирование), соберёт патч, закроет ZCode, установит, запустит приложение
+и проверит, что окно открылось. Если что-то не так — вернёт оригинал обратно.
+В конце появится надпись **DONE! / ГОТОВО!**.
 
-```cmd
-python tool\apply_ru_patch.py
-```
+**Шаг 3.** ZCode откроется с русским интерфейсом. Если нет — **Настройки →
+Язык → Русский** (при русском языке Windows режим «Как в системе» сработает сам).
 
-Вы увидите `syntax OK` у обоих файлов, а в конце — подсказку, что готовый
-файл лежит в `resources\app.asar.new-ru`. Пока ZCode запущен, он блокирует
-свой файл — это нормально.
-
-**Шаг 3.** Установите патч (скрипт сам закроет ZCode, заменит файл, запустит
-приложение и проверит, что окно открылось):
-
-```cmd
-tool\install_with_launchtest.cmd
-```
-
-Если что-то пойдёт не так — скрипт **сам вернёт оригинал** и перезапустит
-ZCode. Отчёт: `C:\Users\<вы>\zcode-swap-result.txt`.
-
-**Шаг 4.** ZCode откроется сам → **Settings → Language → Русский**
-(или оставьте «System default» — при русском языке Windows он выберется сам).
-
-**Шаг 5.** Готово. Пользуйтесь на русском 🙂
-
-> Альтернатива шагу 3: закройте ZCode вручную (проверьте трей возле часов!)
-> и запустите `python tool\apply_ru_patch.py` ещё раз — на этот раз он заменит
-> файл сам. Или используйте `tool\swap_after_close.cmd`, который дождётся
-> закрытия приложения.
-
-### После обновления ZCode
-
-Обновление затирает патч (интерфейс снова станет английским). Лечится за минуту:
+### Установка вручную (по шагам, если удобнее)
 
 ```cmd
 cd zcode-translation-ru
-git pull
-python tool\apply_ru_patch.py
-tool\install_with_launchtest.cmd
+python tool\apply_ru_patch.py          :: соберёт патч (2-4 мин), проверит синтаксис
+tool\install_with_launchtest.cmd       :: закроет ZCode, поставит и проверит
 ```
 
-Патчер ищет нужные файлы **по содержимому, а не по имени** — поэтому обычно
-работает и в новых версиях без изменений. Если точка патча всё-таки изменилась,
-скрипт честно скажет, что не нашёл, — создайте issue, а до фикса откатитесь
-на бэкап.
+- `apply_ru_patch.py` найдёт ZCode сам, **проверит синтаксис** пропатченных
+  файлов (`syntax OK`) и создаст резервную копию. В конце подскажет, что файл
+  готов в `resources\app.asar.new-ru`. Пока ZCode запущен, он держит файл —
+  это нормально, установщик завершит подмену.
+- `install_with_launchtest.cmd` закроет ZCode, поставит патч, **запустит
+  приложение и проверит, что окно открылось**; не открылось — сам откатит.
+  Отчёт: `C:\Users\<вы>\zcode-swap-result.txt`.
+
+> Ручной вариант без установщика: закройте ZCode полностью (проверьте трей
+> возле часов!) и запустите `python tool\apply_ru_patch.py` ещё раз — он
+> подменит файл сам.
+
+### После обновления ZCode ⚠️
+
+**Обновления ZCode стирают русификацию** — это неизбежно, потому что новый
+`app.asar` приходит целиком и заменяет пропатченный. Это ожидаемое поведение,
+а не сбой. Лечится повторным запуском того же `install-ru.cmd` (или двух команд
+из «Установки вручную»). Патчер ищет нужные файлы **по содержимому, а не по
+имени**, поэтому сам находит новые версии чанков после апдейта.
+
+Отдельная тонкость: ZCode скачивает обновление заранее и применяет его при
+следующем перезапуске. Из-за этого патч иногда «исчезает» сразу после установки —
+приложение перезапускается уже на новой версии. Установщик это учитывает:
+перед установкой он удаляет скачанное, но не применённое обновление из кэша,
+а после запуска сверяет размер `app.asar` с размером патча и сообщает, если
+файл всё-таки был подменён.
 
 ### Откат на английский
 
@@ -138,19 +131,25 @@ tool\swap_after_close.cmd "%LOCALAPPDATA%\Programs\ZCode\resources\app.asar.bak-
 2. **Верификация архива** — после пересборки сверяются маркеры патча,
    размер, состав записей и список нативных библиотек.
 3. **Резервная копия** — создаётся перед каждой установкой.
-4. **Автотест запуска** — после установки скрипт запускает ZCode и ждёт
+4. **Защита от автообновления** — перед установкой удаляется скачанное,
+   но ещё не применённое обновление ZCode (иначе оно затрёт патч при
+   перезапуске), а после запуска размер `app.asar` сверяется с размером
+   патча — подмена фиксируется и установка повторяется.
+5. **Автотест запуска** — после установки скрипт запускает ZCode и ждёт
    35 секунд: нет окна — автоматический откат на оригинал и перезапуск.
-5. **Ничего не удаляется** — патч только добавляет русский каталог и
+6. **Ничего не удаляется** — патч только добавляет русский каталог и
    регистрирует язык; английский и китайский остаются на месте.
 
 ### Решение проблем
 
 | Симптом | Причина и решение |
 |---|---|
+| Русский пропал после обновления ZCode | Ожидаемо: новый `app.asar` затёр патч. Запустите `install-ru.cmd` заново |
+| Русский пропал сразу после установки | ZCode применил заранее скачанное обновление при перезапуске. Установщик уже чистит такой кэш — просто запустите `install-ru.cmd` ещё раз |
 | Патчер пишет `app.asar not found` | Нестандартный путь установки. Укажите явно: `python tool\apply_ru_patch.py --asar "C:\путь\к\resources\app.asar"` |
 | Патчер пишет `syntax check FAILED` | Точка патча изменилась в новой версии ZCode. Создайте issue с выводом скрипта |
 | `install_with_launchtest` откатил установку | Смотрите причину в `%USERPROFILE%\zcode-swap-result.txt` |
-| Пункта «Русский» нет в списке | Работает оригинальный `app.asar` — установка не завершена (ZCode блокировал файл). Запустите `tool\install_with_launchtest.cmd` |
+| Пункта «Русский» нет в списке | Работает оригинальный `app.asar` — установка не завершена (ZCode блокировал файл). Запустите `install-ru.cmd` |
 | Антивирус ругается на скрипты | Скрипты полностью открыты: .cmd/.py без сторонних загрузок, всё делает стандартный Python + официальный `@electron/asar` |
 
 ### Улучшение перевода
@@ -208,7 +207,7 @@ and registers the `ru` locale everywhere the app picks a language: locale map,
 validators, system-locale resolver, both language dropdowns, and even the
 crash screen.
 
-> ✅ Battle-tested on **ZCode Desktop 3.14.4 (Windows 11)**, October 2026.
+> ✅ Battle-tested on **ZCode Desktop 3.14.4 and 3.15.1 (Windows 11)**, October 2026.
 > The screenshots above are the real UI after installation.
 
 ### Requirements
@@ -217,10 +216,19 @@ crash screen.
 - [Python 3.8+](https://www.python.org/downloads/) — `python --version`
 - [Node.js 16+](https://nodejs.org/) — `node --version`
 
-### Install in 5 steps (Windows)
+### One-click install (recommended)
+
+1. Download the repo (**Code → Download ZIP** and unpack, or
+   `git clone https://github.com/mdn77/zcode-translation-ru.git`).
+2. Double-click **`install-ru.cmd`**.
+
+It checks Python and Node.js, refreshes the files (if a git clone), builds the
+patch, closes ZCode, installs, relaunches and verifies the window appeared —
+reverting automatically if not. Then open **Settings → Language → Русский**.
+
+### Manual install (step by step)
 
 ```cmd
-git clone https://github.com/mdn77/zcode-translation-ru.git
 cd zcode-translation-ru
 python tool\apply_ru_patch.py
 tool\install_with_launchtest.cmd
@@ -236,22 +244,25 @@ What each step does:
    catalog, and **syntax-checks the result with `node --check`** — an invalid
    patch can never be installed. The patched file is staged next to the
    original because running ZCode locks it.
-2. `install_with_launchtest.cmd` closes ZCode, swaps the patched file in,
-   launches the app and **verifies a window actually appears within 35
-   seconds; if not, it automatically reverts to the original** and restarts
-   ZCode. No way to brick the app.
+2. `install_with_launchtest.cmd` closes ZCode, **deletes any downloaded but
+   unapplied ZCode update from the updater cache** (otherwise it would
+   overwrite the patch on restart), swaps the patched file in, launches the app
+   and **verifies a window actually appears within 35 seconds, then checks the
+   patched file is still in place; if not, it reverts to the original** and
+   restarts ZCode. No way to brick the app.
 3. A timestamped backup `app.asar.bak-<date>` is created before every install.
 
-### After ZCode updates
+### After ZCode updates ⚠️
 
-App updates overwrite the patch (the UI turns English again). Re-apply:
+**ZCode updates wipe the patch** — the new `app.asar` arrives whole and
+replaces the patched one. This is expected, not a failure: just run
+`install-ru.cmd` again (or the two manual commands). The patcher locates the
+chunks **by content**, so it finds the new version's files automatically.
 
-```cmd
-cd zcode-translation-ru
-git pull
-python tool\apply_ru_patch.py
-tool\install_with_launchtest.cmd
-```
+One subtlety: ZCode downloads an update in advance and applies it on the next
+restart, so a fresh patch can seem to "vanish" right after install. The
+installer handles this: it clears the pending update cache first and verifies
+the patched file survives the launch.
 
 ### Rollback
 
@@ -265,14 +276,17 @@ Use the newest `.bak-…` file in the resources folder.
 
 | Symptom | Fix |
 |---|---|
+| Russian disappeared after a ZCode update | Expected — the update replaced the patched file. Run `install-ru.cmd` again |
+| Russian disappeared right after installing | ZCode applied an update it had downloaded earlier. The installer already clears that cache — just run `install-ru.cmd` again |
 | `app.asar not found` | Pass the path explicitly: `python tool\apply_ru_patch.py --asar "C:\path\to\resources\app.asar"` |
 | `syntax check FAILED` | The patch point changed in a newer ZCode — please open an issue with the script output |
 | Install was auto-reverted | See `%USERPROFILE%\zcode-swap-result.txt` for the reason |
-| No «Русский» in the list | The original archive is still active — the final swap never happened; run `tool\install_with_launchtest.cmd` |
+| No «Русский» in the list | The original archive is still active — the final swap never happened; run `install-ru.cmd` |
 
 ### Repo layout
 
 ```
+install-ru.cmd                      one-click installer (patch + install)
 tool/apply_ru_patch.py              the patcher (Python + official @electron/asar)
 tool/install_with_launchtest.cmd    install + launch test + auto-rollback
 tool/swap_after_close.cmd           plain file swap helper
