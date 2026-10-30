@@ -9,7 +9,7 @@
 **6 013 строк интерфейса · переключатель «Русский» в настройках · патчер с автотестом запуска и автооткатом**
 
 [![ZCode](https://img.shields.io/badge/app-ZCode%20Desktop-blue)](https://z.ai)
-[![tested](https://img.shields.io/badge/tested-3.15.1%20Win-success)](#-русский)
+[![tested](https://img.shields.io/badge/tested-3.17.1%20Win-success)](#-русский)
 [![strings](https://img.shields.io/badge/strings-6%20013-green)](translations/ru-RU-catalog.json)
 [![license](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
@@ -35,8 +35,10 @@
 карта локалей, валидаторы, системный определитель, оба выпадающих списка
 в настройках и даже экран критической ошибки.
 
-> ✅ Проверено на **ZCode Desktop 3.14.4 и 3.15.1 (Windows 11)**, октябрь 2026.
-> Скриншот выше — реальный интерфейс после установки.
+> ✅ Проверено вживую на **3.14.4 · 3.15.1 · 3.15.3 · 3.16.2 · 3.16.3 · 3.17.1**
+> (Windows 11, последняя — октябрь 2026). Патчер переживает обновления:
+> ищет нужные файлы по содержимому, а после апдейта просто запустите
+> `install-ru.cmd` ещё раз. Скриншот выше — реальный интерфейс после установки.
 
 <table>
 <tr>
@@ -207,7 +209,9 @@ and registers the `ru` locale everywhere the app picks a language: locale map,
 validators, system-locale resolver, both language dropdowns, and even the
 crash screen.
 
-> ✅ Battle-tested on **ZCode Desktop 3.14.4 and 3.15.1 (Windows 11)**, October 2026.
+> ✅ Battle-tested on **3.14.4 · 3.15.1 · 3.15.3 · 3.16.2 · 3.16.3 · 3.17.1**
+> (Windows 11, latest — October 2026). The patcher survives app updates: it
+> locates files by content, so after an update just run `install-ru.cmd` again.
 > The screenshots above are the real UI after installation.
 
 ### Requirements

@@ -206,8 +206,9 @@ def patch_main_chunk(text):
         raise RuntimeError('import from IntlProvider chunk not found')
 
     # 2. Error-screen dictionary getter: add a ru branch.
+    # Minified identifiers may contain "$" (e.g. function $0), so allow [\w$].
     text, n = re.subn(
-        f'function (?P<f>\\w+)\\(e\\){OB}return\\((?P<g>\\w+)\\(\\)==={qx("en-US")}\\?(?P<en>\\w+):(?P<zh>\\w+)\\)\\[e\\]\\?\\?e{CB}',
+        f'function (?P<f>[\\w$]+)\\(e\\){OB}return\\((?P<g>[\\w$]+)\\(\\)==={qx("en-US")}\\?(?P<en>[\\w$]+):(?P<zh>[\\w$]+)\\)\\[e\\]\\?\\?e{CB}',
         lambda m: (f'function {m.group("f")}(e){LBR}return({m.group("g")}()==={qx("en-US")}?{m.group("en")}:'
                    f'{m.group("g")}()==={qx("ru")}?{RU_VAR_LOCAL}:{m.group("zh")})[e]??e{RBR}'),
         text, count=1)
