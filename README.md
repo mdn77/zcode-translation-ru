@@ -4,12 +4,25 @@
 
 ### Russian UI localization for ZCode Desktop
 
+> ## 🎉 АКТУАЛЬНОЕ / CURRENT STATUS
+> ### Русский язык теперь ОФИЦИАЛЬНО встроен в ZCode
+> ### Russian is now officially built into ZCode
+>
+> **Обновите приложение до 3.18.0 или новее — русский уже в коробке.**
+> **Update to 3.18.0+ — Russian ships out of the box. Настройки → Язык → Русский.**
+>
+> Этот репозиторий сохранён для истории и для **старых версий** (3.14.4–3.17.x):
+> там патч ниже по-прежнему работает. / This repo is kept for **older versions**.
+
+---
+
 <img src="docs/screenshot-ru.png" alt="ZCode на русском / ZCode in Russian" width="820">
 
 **6 013 строк интерфейса · переключатель «Русский» в настройках · патчер с автотестом запуска и автооткатом**
 
 [![ZCode](https://img.shields.io/badge/app-ZCode%20Desktop-blue)](https://z.ai)
-[![tested](https://img.shields.io/badge/tested-3.17.2%20Win-success)](#-русский)
+[![official](https://img.shields.io/badge/official%20ru%20since-3.18.0-success)](#-русский)
+[![legacy patch](https://img.shields.io/badge/legacy%20patch-3.14.4%E2%80%933.17.x-yellow)](#установка-на-старые-версии-в-один-клик-31443172)
 [![strings](https://img.shields.io/badge/strings-6%20013-green)](translations/ru-RU-catalog.json)
 [![license](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
@@ -21,24 +34,36 @@
 
 ## 🇷🇺 Русский
 
-### Что это
+### Нужен ли вам этот проект?
 
-**ZCode Desktop** (приложение Z.ai для работы с ИИ-агентами) официально
-локализован только на английский и китайский. Этот проект добавляет
+**Скорее всего — нет.** Начиная с **ZCode 3.18.0** русский язык официально
+встроен в приложение (в каталоге — более 7 000 русских строк, локаль
+`ru-RU` в списке языков). Просто обновите ZCode и выберите
+**Настройки → Язык → Русский**.
+
+Этот репозиторий оставлен как **архив и как инструмент для старых версий**:
+если вы застряли на **3.14.4–3.17.2** (где официального русского ещё не было),
+патч ниже работает — установка в один клик, с проверкой синтаксиса, автотестом
+запуска и автооткатом.
+
+### Что это (история)
+
+**ZCode Desktop** (приложение Z.ai для работы с ИИ-агентами) до версии 3.18.0
+официально локализован только на английский и китайский. Этот проект добавлял
 **русский язык** в интерфейс: меню, настройки, чат, диалоги, статистику —
-всё становится русским, а в настройках появляется переключатель языка
+всё становилось русским, а в настройках появлялся переключатель языка
 с пунктом **«Русский»**.
 
-В приложение уже встроена система локализации (react-intl) — но русского
-каталога в ней просто не было. Патчер добавляет каталог из 6 013 переведённых
-строк и регистрирует язык `ru` во всех местах, где приложение выбирает язык:
+В приложение уже была встроена система локализации (react-intl) — но русского
+каталога в ней просто не было. Патчер добавлял каталог из 6 013 переведённых
+строк и регистрировал язык `ru` во всех местах, где приложение выбирает язык:
 карта локалей, валидаторы, системный определитель, оба выпадающих списка
 в настройках и даже экран критической ошибки.
 
 > ✅ Проверено вживую на **3.14.4 · 3.15.1 · 3.15.3 · 3.16.2 · 3.16.3 · 3.17.1 · 3.17.2**
-> (Windows 11, последняя — ноябрь 2026). Патчер переживает обновления:
-> ищет нужные файлы по содержимому, а после апдейта просто запустите
-> `install-ru.cmd` ещё раз. Скриншот выше — реальный интерфейс после установки.
+> (Windows 11, 2026). Патчер переживает обновления: ищет нужные файлы
+> по содержимому, а после апдейта просто запустите `install-ru.cmd` ещё раз.
+> Скриншот выше — реальный интерфейс после установки.
 
 <table>
 <tr>
@@ -63,7 +88,7 @@
 Никаких платных инструментов; интернет нужен один раз — чтобы скачался
 упаковщик `@electron/asar`.
 
-### Установка в один клик (рекомендуется)
+### Установка на старые версии в один клик (3.14.4–3.17.2)
 
 **Шаг 1.** Скачайте репозиторий: зелёная кнопка **Code → Download ZIP**,
 распакуйте. (Или `git clone https://github.com/mdn77/zcode-translation-ru.git`.)
@@ -98,13 +123,15 @@ tool\install_with_launchtest.cmd       :: закроет ZCode, поставит
 > возле часов!) и запустите `python tool\apply_ru_patch.py` ещё раз — он
 > подменит файл сам.
 
-### После обновления ZCode ⚠️
+### После обновления ZCode ⚠️ (только для старых версий, 3.14.4–3.17.2)
 
-**Обновления ZCode стирают русификацию** — это неизбежно, потому что новый
-`app.asar` приходит целиком и заменяет пропатченный. Это ожидаемое поведение,
-а не сбой. Лечится повторным запуском того же `install-ru.cmd` (или двух команд
-из «Установки вручную»). Патчер ищет нужные файлы **по содержимому, а не по
-имени**, поэтому сам находит новые версии чанков после апдейта.
+На **3.18.0+** этого раздела больше не существует — русский там официальный.
+Для старых версий: **обновления ZCode стирают русификацию** — это неизбежно,
+потому что новый `app.asar` приходит целиком и заменяет пропатченный. Это
+ожидаемое поведение, а не сбой. Лечится повторным запуском того же
+`install-ru.cmd` (или двух команд из «Установки вручную»). Патчер ищет нужные
+файлы **по содержимому, а не по имени**, поэтому сам находит новые версии
+чанков после апдейта.
 
 Отдельная тонкость: ZCode скачивает обновление заранее и применяет его при
 следующем перезапуске. Из-за этого патч иногда «исчезает» сразу после установки —
@@ -196,22 +223,33 @@ PR с улучшениями очень приветствуются! Исход
 
 ## 🇬🇧 English
 
-### What is this
+### Do you need this project?
 
-**ZCode Desktop** (the Z.ai AI-agent app) officially ships with English and
-Chinese UI only. This project adds a **Russian language** option: menus,
-settings, chat, dialogs and statistics become Russian, and a **«Русский»**
-item appears in the app's language selector.
+**Probably not.** Starting with **ZCode 3.18.0**, Russian is officially built
+into the app (7,000+ Russian strings in the catalog, `ru-RU` in the language
+list). Just update ZCode and pick **Settings → Language → Русский**.
 
-The app already has a full localization system (react-intl) — it just never
-had a Russian catalog. The patcher injects a 6 013-string translated catalog
-and registers the `ru` locale everywhere the app picks a language: locale map,
+This repository is kept as an **archive and as a tool for older versions**:
+if you are stuck on **3.14.4–3.17.2** (which had no official Russian), the
+patch below still works — one-click install, syntax-checked, with a launch
+test and auto-rollback.
+
+### What this was (history)
+
+**ZCode Desktop** (the Z.ai AI-agent app) up to version 3.18.0 officially
+shipped with English and Chinese UI only. This project added a **Russian
+language** option: menus, settings, chat, dialogs and statistics became
+Russian, and a **«Русский»** item appeared in the app's language selector.
+
+The app already had a full localization system (react-intl) — it just never
+had a Russian catalog. The patcher injected a 6 013-string translated catalog
+and registered the `ru` locale everywhere the app picks a language: locale map,
 validators, system-locale resolver, both language dropdowns, and even the
 crash screen.
 
 > ✅ Battle-tested on **3.14.4 · 3.15.1 · 3.15.3 · 3.16.2 · 3.16.3 · 3.17.1 · 3.17.2**
-> (Windows 11, latest — November 2026). The patcher survives app updates: it
-> locates files by content, so after an update just run `install-ru.cmd` again.
+> (Windows 11, 2026). The patcher survives app updates: it locates files by
+> content, so after an update just run `install-ru.cmd` again.
 > The screenshots above are the real UI after installation.
 
 ### Requirements
@@ -220,7 +258,7 @@ crash screen.
 - [Python 3.8+](https://www.python.org/downloads/) — `python --version`
 - [Node.js 16+](https://nodejs.org/) — `node --version`
 
-### One-click install (recommended)
+### One-click install for older versions (3.14.4-3.17.2)
 
 1. Download the repo (**Code → Download ZIP** and unpack, or
    `git clone https://github.com/mdn77/zcode-translation-ru.git`).
@@ -256,9 +294,9 @@ What each step does:
    restarts ZCode. No way to brick the app.
 3. A timestamped backup `app.asar.bak-<date>` is created before every install.
 
-### After ZCode updates ⚠️
+### After ZCode updates (older versions only, 3.14.4-3.17.2) ⚠️
 
-**ZCode updates wipe the patch** — the new `app.asar` arrives whole and
+On 3.18.0+ this section does not exist - Russian there is official. For older versions: **ZCode updates wipe the patch** — the new `app.asar` arrives whole and
 replaces the patched one. This is expected, not a failure: just run
 `install-ru.cmd` again (or the two manual commands). The patcher locates the
 chunks **by content**, so it finds the new version's files automatically.
