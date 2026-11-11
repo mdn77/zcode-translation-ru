@@ -347,9 +347,22 @@ docs/screenshot-language.png        language picker with «Русский»
 - Not affiliated with Z.ai. Use at your own risk; the tool creates backups
   and never deletes anything.
 
+## 🏆 История проекта / Project history
+
+| Дата / Date | Событие / Event |
+|---|---|
+| 02.10.2026 | Вопрос «а можно русифицировать?» → реверс-инжиниринг `app.asar`: найдена react-intl-инфраструктура, извлечены каталоги en-US/zh-CN / Reverse-engineered the asar, extracted the en-US/zh-CN catalogs |
+| 03.10.2026 | 6 013 строк переведены 12 параллельными агентами; репозиторий опубликован, **Release v1.0.0** / 6,013 strings translated by 12 parallel agents; repo published, **Release v1.0.0** |
+| 03.10.2026 | Ветка `feat/russian-ui-locale` в форке `zai-org/ZCode` (официальный репозиторий — зеркало, PR не принимаются) / Full locale branch pushed to the fork of `zai-org/ZCode` (upstream is a mirror, PRs not accepted) |
+| 12.10-30.10.2026 | Патч пережил 5 обновлений ZCode (3.15.1 -> 3.17.2); починены коллизия имён в минифицированном бандле и `$`-идентификаторы / The patch survived 5 ZCode updates (3.15.1 -> 3.17.2); fixed an identifier collision and `$`-prefixed minified names |
+| **11.11.2026** | 🎉 **ZCode 3.18.0: русский язык официально встроен** (7 250 строк, локаль `ru-RU`). Миссия выполнена / **ZCode 3.18.0: Russian is officially built in** (7,250 strings, `ru-RU` locale). Mission complete. |
+
 ---
 
+
 <div align="center">
+
+**Сделано сообществом для сообщества / Made by the community, for the community**
 
 **Лицензия / License:** MIT — [LICENSE](LICENSE)
 
